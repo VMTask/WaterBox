@@ -161,3 +161,4 @@ cython_debug/
 interface/__pycache__
 mods/__pycache__
 resources/__pycache__
+test.log
