@@ -1,0 +1,1 @@
+.\adb_executable\adb -s <bound method ComboBoxBase.currentText of <qfluentwidgets.components.widgets.combo_box.ComboBox object at 0x0000019D63A6F820>> shell getprop ro.product.model

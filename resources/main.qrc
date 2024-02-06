@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="images">
+    <file>icon.png</file>
+    <file>afternoon.png</file>
+    <file>morning.png</file>
+    <file>night.png</file>
+  </qresource>
+</RCC>
