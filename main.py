@@ -1,23 +1,42 @@
 # coding:utf-8
 import json
 import sys
-import re
+import os
 import time
 from PyQt5.QtCore import Qt, QUrl, QThread, pyqtSignal, pyqtSlot, QSize, QEventLoop, QTimer
-from PyQt5.QtGui import QIcon, QDesktopServices
-from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout
+from PyQt5.QtGui import QIcon, QDesktopServices, QDragEnterEvent, QDropEvent
+from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QWidget
 from qfluentwidgets import (NavigationItemPosition, MessageBox, setTheme, Theme, MSFluentWindow,
-                            NavigationAvatarWidget, qrouter, SubtitleLabel, setFont, SplashScreen,setThemeColor)
+                            NavigationAvatarWidget, qrouter, SubtitleLabel, setFont, SplashScreen,setThemeColor,SimpleCardWidget)
 from qfluentwidgets import FluentIcon as FIF
 from resources import main_rc
 from interface import HomeActivity, RestartADB
 from datetime import datetime
 import asyncio
-from typing import Union
-from mods import asyncadb, CommandExecuter
+from mods import asyncadb, CommandExecuter, getAPKInfo
+
+
 device_name_list = []
+from interface import ApplicationActivity
 
 
+class getAPKInfo_thread(QThread):
+    sig = pyqtSignal(dict)
+    
+    def __init__(self,file,parent=None):
+        super(getAPKInfo_thread, self).__init__(parent)
+        self.file = file
+    def run(self):
+        app = getAPKInfo.getAPKInfo(self.file,f"{os.getcwd()}\\adb_executable\\aapt.exe")
+        result = {
+            "name": app.getAppName(),
+            "version": app.getAppVersion(),
+            "packageName": app.getAppPackageName(),
+            "minSDK":  app.getAppMinSDK(),
+            "targetSDK": app.getAppTargetSDK(),
+            "iconFile": app.getAppIcon()
+        }
+        self.sig.emit(result)
 
 
 class ADBWaiter(QThread):
@@ -48,6 +67,58 @@ class ADBWaiter(QThread):
             })
     def run(self):
         asyncio.run(self.wait_track_devices())
+
+class ApplicationWidget(QFrame):
+    def __init__(self, parent: None):
+        super().__init__(parent)
+        
+        self.ui = ApplicationActivity.Ui_Frame()
+        self.ui.setupUi(self)
+        
+        self.ui.SimpleCardWidget.setAcceptDrops(True)
+        self.ui.SimpleCardWidget.dragEnterEvent = self.dragEnterEvent
+        self.ui.SimpleCardWidget.dropEvent = self.dropEvent
+        
+        self.ui.ElevatedCardWidget.setAcceptDrops(True)
+        self.ui.ElevatedCardWidget.dragEnterEvent = self.dragEnterEvent1
+        self.ui.ElevatedCardWidget.dropEvent = self.dropEvent
+        self.ui.IndeterminateProgressBar.hide()
+
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def AppInfo_processor(self,result):
+        self.ui.SubtitleLabel.setText(f"应用名称:{result['name']}")
+        self.ui.SubtitleLabel_2.setText(f"应用版本:{result['version']}")
+        self.ui.SubtitleLabel_4.setText(f"应用包名:{result['packageName']}")
+        self.ui.SubtitleLabel_5.setText(f"应用minSDK:{result['minSDK']}")
+        self.ui.SubtitleLabel_6.setText(f"应用targetSDK:{result['targetSDK']}")
+        self.ui.IconWidget.setIcon(QIcon(result["iconFile"]))
+
+    def dropEvent(self, event: QDropEvent):
+        urls = [url.toLocalFile() for url in event.mimeData().urls()]
+        if urls:
+            if(os.path.splitext(', '.join(urls))[1].lower() == ".apk".lower()):
+                self.getAppInfo_thread = getAPKInfo_thread(', '.join(urls))
+                self.getAppInfo_thread.sig.connect(self.AppInfo_processor)
+                self.getAppInfo_thread.start()
+            else:
+                w = MessageBox("提醒", "请拖入.apk格式文件", self)
+                if(w.exec()):
+                    pass
+            
+    def dragEnterEvent1(self, event: QDragEnterEvent):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent1(self, event: QDropEvent):
+        urls = [url.toLocalFile() for url in event.mimeData().urls()]
+        if urls:
+            # 在此处处理拖入的文件
+            print(f"Dropped files: {', '.join(urls)}")
+            
+    
 
 class HomeWidget(QFrame):
     def __init__(self, parent=None):
@@ -143,7 +214,7 @@ class Window(MSFluentWindow):
         self.windowEffect.setAcrylicEffect(self.winId())
         self.homeInterface = HomeWidget(self)
         setThemeColor('#28afe9')
-        self.appInterface = Widget('Application Interface', self)
+        self.appInterface = ApplicationWidget(self)
         self.videoInterface = Widget('Video Interface', self)
         self.libraryInterface = Widget('library Interface', self)
         self.waiterThread = ADBWaiter()
@@ -157,6 +228,7 @@ class Window(MSFluentWindow):
         self.addSubInterface(self.homeInterface, FIF.HOME, '主页', FIF.HOME_FILL)
         self.addSubInterface(self.appInterface, FIF.APPLICATION, '应用')
         self.addSubInterface(self.videoInterface, FIF.VIDEO, '视频')
+        self.navigationInterface.buttons()[1].setDisabled(True)
 
         self.addSubInterface(self.libraryInterface, FIF.SETTING, '库', FIF.SETTING, NavigationItemPosition.BOTTOM)
         self.navigationInterface.addItem(
@@ -200,22 +272,24 @@ class Window(MSFluentWindow):
                     self.homeInterface.ui.ComboBox.items.clear()
                     self.homeInterface.ui.ComboBox.addItems(device_name_list)
                     self.homeInterface.ui.ComboBox.setCurrentIndex(len(device_name_list)-1)
+                    self.navigationInterface.buttons()[1].setDisabled(False)
                 elif(data['present'] != True):
                     device_name_list.remove(data['serial'])
                     self.homeInterface.ui.ComboBox.items.clear()
                     self.homeInterface.ui.ComboBox.addItems(device_name_list)
-                    self.homeInterface.ui.StrongBodyLabel_4.setText("(未连接)")
                     self.homeInterface.ui.ProgressBar.setValue(0)
                     self.homeInterface.ui.ComboBox.setCurrentIndex(len(device_name_list)-1)
                     if(len(device_name_list) == 0):
                         self.homeInterface.ui.ComboBox.setDisabled(True)
                         self.homeInterface.ui.ComboBox.setText("(未连接)")
+                        self.navigationInterface.buttons()[1].setDisabled(True)
                         self.homeInterface.ui.StrongBodyLabel_4.setText("(未连接)")
                         self.homeInterface.ui.StrongBodyLabel_6.setText("(未连接)")
                         self.homeInterface.ui.ProgressBar.setValue(0)
                         
                     else:
                         self.homeInterface.ui.ComboBox.setDisabled(False)
+                        self.navigationInterface.buttons()[1].setDisabled(False)
                         self.homeInterface.ui.ComboBox.setCurrentIndex(len(device_name_list))
             else:
                 w = MessageBox("ERROR", f"程序已崩溃,崩溃原因如下:{data['error']}", self)
@@ -236,9 +310,10 @@ if __name__ == '__main__':
     QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-
+    import os
     # setTheme(Theme.DARK)
-
+    if(os.path.exists("cache") == False):
+        os.mkdir("cache")
     app = QApplication(sys.argv)
     RestartADBWindow = RestartADB.RestartADBWindow()
     w = Window()

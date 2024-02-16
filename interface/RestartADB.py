@@ -52,6 +52,7 @@ class RestartADBWindow(AcrylicWindow, Ui_Form):
         self.windowEffect.setMicaEffect(self.winId(), isDarkMode=False)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setWindowFlags(Qt.WindowSystemMenuHint)
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, True)
         desktop = QApplication.desktop().availableGeometry()
         w, h = desktop.width(), desktop.height()
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)

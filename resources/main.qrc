@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>unknown_package.png</file>
     <file>icon.png</file>
     <file>afternoon.png</file>
     <file>morning.png</file>
