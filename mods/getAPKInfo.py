@@ -58,7 +58,7 @@ class getAPKInfo():
             return "App hasn't got a targetSDK"
         
     def getAppIcon(self):
-        pattern = r'application-icon-640:\s*\'(.*)\''
+        pattern = r'application-icon-240:\s*\'(.*)\''
         match = re.search(pattern, self.output)
     
         if match:

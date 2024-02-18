@@ -1,11 +1,12 @@
 # coding:utf-8
 import json
+import shutil
 import sys
 import os
 import time
-from PyQt5.QtCore import Qt, QUrl, QThread, pyqtSignal, pyqtSlot, QSize, QEventLoop, QTimer
-from PyQt5.QtGui import QIcon, QDesktopServices, QDragEnterEvent, QDropEvent
-from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QWidget
+from PyQt5.QtCore import Qt, QUrl, QThread, pyqtSignal, pyqtSlot, QSize, QEventLoop, QTimer, QRegExp
+from PyQt5.QtGui import QIcon, QDesktopServices, QDragEnterEvent, QDropEvent, QRegExpValidator
+from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QWidget, QFileDialog
 from qfluentwidgets import (NavigationItemPosition, MessageBox, setTheme, Theme, MSFluentWindow,
                             NavigationAvatarWidget, qrouter, SubtitleLabel, setFont, SplashScreen,setThemeColor,SimpleCardWidget)
 from qfluentwidgets import FluentIcon as FIF
@@ -27,16 +28,24 @@ class getAPKInfo_thread(QThread):
         super(getAPKInfo_thread, self).__init__(parent)
         self.file = file
     def run(self):
-        app = getAPKInfo.getAPKInfo(self.file,f"{os.getcwd()}\\adb_executable\\aapt.exe")
-        result = {
-            "name": app.getAppName(),
-            "version": app.getAppVersion(),
-            "packageName": app.getAppPackageName(),
-            "minSDK":  app.getAppMinSDK(),
-            "targetSDK": app.getAppTargetSDK(),
-            "iconFile": app.getAppIcon()
-        }
-        self.sig.emit(result)
+        try:
+            app = getAPKInfo.getAPKInfo(self.file,f"{os.getcwd()}\\adb_executable\\aapt.exe")
+            result = {
+                "name": app.getAppName(),
+                "version": app.getAppVersion(),
+                "packageName": app.getAppPackageName(),
+                "minSDK":  app.getAppMinSDK(),
+                "targetSDK": app.getAppTargetSDK(),
+                "iconFile": app.getAppIcon()
+            }
+            self.sig.emit(result)
+        except Exception as err:
+            with open("test.log","w") as f:
+                f.write("error")
+            self.sig.emit({
+                "status": "error",
+                "error_info": err
+            })
 
 
 class ADBWaiter(QThread):
@@ -81,20 +90,29 @@ class ApplicationWidget(QFrame):
         
         self.ui.ElevatedCardWidget.setAcceptDrops(True)
         self.ui.ElevatedCardWidget.dragEnterEvent = self.dragEnterEvent1
-        self.ui.ElevatedCardWidget.dropEvent = self.dropEvent
+        self.ui.ElevatedCardWidget.dropEvent = self.dropEvent1
         self.ui.IndeterminateProgressBar.hide()
-
+        self.ui.PrimaryPushButton_2.clicked.connect(self.chooseAPKFile_info)
+        self.ui.PushButton.clicked.connect(self.chooseAPKFile_install)
+        self.ui.SubtitleLabel_8.hide()
+        self.ui.PrimaryPushButton.clicked.connect(self.install_application)
+        
+        
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
 
     def AppInfo_processor(self,result):
-        self.ui.SubtitleLabel.setText(f"应用名称:{result['name']}")
-        self.ui.SubtitleLabel_2.setText(f"应用版本:{result['version']}")
-        self.ui.SubtitleLabel_4.setText(f"应用包名:{result['packageName']}")
-        self.ui.SubtitleLabel_5.setText(f"应用minSDK:{result['minSDK']}")
-        self.ui.SubtitleLabel_6.setText(f"应用targetSDK:{result['targetSDK']}")
-        self.ui.IconWidget.setIcon(QIcon(result["iconFile"]))
+        if(result.get("status") == "error"):
+            w = MessageBox("错误",f"APK解析错误,错误如下:\n{result.get('error_info')}",self)
+            w.exec()
+        else:
+            self.ui.SubtitleLabel.setText(f"应用名称:{result['name']}")
+            self.ui.SubtitleLabel_2.setText(f"应用版本:{result['version']}")
+            self.ui.SubtitleLabel_4.setText(f"应用包名:{result['packageName']}")
+            self.ui.SubtitleLabel_5.setText(f"应用minSDK:{result['minSDK']}")
+            self.ui.SubtitleLabel_6.setText(f"应用targetSDK:{result['targetSDK']}")
+            self.ui.IconWidget.setIcon(QIcon(result["iconFile"]))
 
     def dropEvent(self, event: QDropEvent):
         urls = [url.toLocalFile() for url in event.mimeData().urls()]
@@ -105,8 +123,17 @@ class ApplicationWidget(QFrame):
                 self.getAppInfo_thread.start()
             else:
                 w = MessageBox("提醒", "请拖入.apk格式文件", self)
-                if(w.exec()):
-                    pass
+                w.exec()
+    def chooseAPKFile_info(self):
+        fileInfo ,filetype= QFileDialog.getOpenFileName(self, "选择文件", os.getcwd(), "应用安装包(*.apk)")
+        if(fileInfo != ""):
+            self.getAppInfo_thread = getAPKInfo_thread(fileInfo)
+            self.getAppInfo_thread.sig.connect(self.AppInfo_processor)
+            self.getAppInfo_thread.start()
+    def chooseAPKFile_install(self):
+        fileInfo ,filetype= QFileDialog.getOpenFileNames(self, "选择文件", os.getcwd(), "应用安装包(*.apk)")
+        if(fileInfo != ""):
+            self.ui.LineEdit.setText(json.dumps(fileInfo))
             
     def dragEnterEvent1(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
@@ -115,8 +142,42 @@ class ApplicationWidget(QFrame):
     def dropEvent1(self, event: QDropEvent):
         urls = [url.toLocalFile() for url in event.mimeData().urls()]
         if urls:
-            # 在此处处理拖入的文件
-            print(f"Dropped files: {', '.join(urls)}")
+            if(os.path.splitext(', '.join(urls))[1].lower() == ".apk".lower()):
+                self.ui.LineEdit.setText(json.dumps(', '.join(urls)))
+            else:
+                w = MessageBox("提醒", "请拖入.apk格式文件", self)
+                w.exec()
+    
+    def install_application_info_processor(self,data):
+        if("failed" in data):
+            w = MessageBox("错误",f"安装时出现错误,错误如下:\n{data}",self)
+            w.exec()
+        elif(data == "Installed"):
+            self.ui.IndeterminateProgressBar.hide()
+            self.ui.SubtitleLabel_8.hide()
+            self.ui.PlainTextEdit.appendPlainText(data)
+            w = MessageBox("提示",f'安装完毕！',self)
+            w.exec()
+        else:
+            self.ui.PlainTextEdit.appendPlainText(data)
+            
+    def install_application_count_processor(self,data):
+        self.ui.SubtitleLabel_8.setText(f"正在安装第{data}个应用")
+    
+    
+    def install_application(self):
+        try:
+            data = json.loads(self.ui.LineEdit.text())
+            self.ui.IndeterminateProgressBar.show()
+            self.ui.SubtitleLabel_8.show()
+            self.t = CommandExecuter.InstallApp(data)
+            self.t.sig.connect(self.install_application_info_processor)
+            self.t.int_sig.connect(self.install_application_count_processor)
+            self.t.start()
+        except Exception:
+            pass
+        
+                
             
     
 
@@ -148,6 +209,13 @@ class HomeWidget(QFrame):
         self.ui.ComboBox.setDisabled(True)
         self.ui.ComboBox.setText("(未连接)")
         self.ui.ComboBox.currentTextChanged.connect(self.onComboBoxTextChanged)
+        reg_exp = QRegExp(r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+        validator = QRegExpValidator(reg_exp, self.ui.LineEdit)
+        self.ui.LineEdit.setValidator(validator)
+        number_reg_exp = QRegExp(r'^\d*$')
+        number_validator = QRegExpValidator(number_reg_exp,self.ui.LineEdit_2)
+        self.ui.LineEdit_2.setValidator(number_validator)
+        self.ui.PrimaryPushButton.clicked.connect(self.connectDevices)
     
     def getModelThread_response(self,data:str):
         lines = data.split('\n')  # 将字符串按换行符分割成列表
@@ -167,7 +235,7 @@ class HomeWidget(QFrame):
         self.getModelThread.sig.connect(self.getModelThread_response)
         self.getModelThread.wait()
         self.getModelThread.start()
-        self.getBatteryThread = CommandExecuter.CommandExecuter(f".\\adb_executable\\adb -s {self.ui.ComboBox.currentText()} shell dumpsys battery | findstr level")
+        self.getBatteryThread = CommandExecuter.CommandExecuter(f".\\adb_executable\\adb -s {self.ui.ComboBox.currentText()} shell dumpsys battery | grep level")
         self.getBatteryThread.sig.connect(self.getBatteryThread_response)
         self.getBatteryThread.wait()
         self.getBatteryThread.start()
@@ -175,6 +243,34 @@ class HomeWidget(QFrame):
         self.getManufacturerThread.sig.connect(self.getManufacturerThread_response)
         self.getManufacturerThread.wait()
         self.getManufacturerThread.start()
+        
+    def connectDevices(self):
+        def getResult(result):
+            if("bad port number" in result):
+                w = MessageBox("错误","端口号填写有误",self)
+                w.exec()
+            elif("无法连接" in result):
+                w = MessageBox("错误","连接失败,请检查端口和IP是否正常",self)
+                w.exec()
+            elif("connected" in result):
+                w = MessageBox("提示","连接成功",self)
+                w.exec()
+            else:
+                w = MessageBox("错误",f"未知错误，错误如下:\n{result}",self)
+                w.exec()
+        if(self.ui.LineEdit.text() != ""):
+            if(self.ui.LineEdit_2.text() == ""):
+                port = "5555"
+                self.t = CommandExecuter.CommandExecuter(f'{os.getcwd()}/adb_executable/adb.exe connect {self.ui.LineEdit.text()}:{port}')
+                self.t.sig.connect(getResult)
+                self.t.start()
+            else:
+                self.t = CommandExecuter.CommandExecuter(f'{os.getcwd()}/adb_executable/adb.exe connect {self.ui.LineEdit.text()}:{self.ui.LineEdit_2.text()}')
+                self.t.sig.connect(getResult)
+                self.t.start()
+        else:
+            w = MessageBox("错误","未填写IP地址",self)
+            w.exec()
 
 
 
@@ -204,6 +300,7 @@ class Window(MSFluentWindow):
         if w.exec():
             event.accept()
             self.waiterThread.quit()
+            shutil.rmtree(f"{os.getcwd()}/cache")
             RestartADBWindow.close()
         else:
             event.ignore()
@@ -211,12 +308,13 @@ class Window(MSFluentWindow):
         super().__init__()
         self.titleBar.maxBtn.hide()
         # create sub interface
-        self.windowEffect.setAcrylicEffect(self.winId())
+        self.windowEffect.setMicaEffect(self.winId())
         self.homeInterface = HomeWidget(self)
         setThemeColor('#28afe9')
         self.appInterface = ApplicationWidget(self)
         self.videoInterface = Widget('Video Interface', self)
         self.libraryInterface = Widget('library Interface', self)
+        self.aboutInterface = Widget("关于界面",self)
         self.waiterThread = ADBWaiter()
         self.waiterThread.sig.connect(self.waiterProcessor)
         self.waiterThread.error_sig.connect(self.waiterProcessor)
@@ -226,19 +324,12 @@ class Window(MSFluentWindow):
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, FIF.HOME, '主页', FIF.HOME_FILL)
-        self.addSubInterface(self.appInterface, FIF.APPLICATION, '应用')
-        self.addSubInterface(self.videoInterface, FIF.VIDEO, '视频')
+        self.addSubInterface(self.appInterface, FIF.APPLICATION, '应用安装')
+        self.addSubInterface(self.videoInterface, FIF.VIDEO, '屏幕工具箱')
         self.navigationInterface.buttons()[1].setDisabled(True)
 
-        self.addSubInterface(self.libraryInterface, FIF.SETTING, '库', FIF.SETTING, NavigationItemPosition.BOTTOM)
-        self.navigationInterface.addItem(
-            routeKey='Help',
-            icon=FIF.HELP,
-            text='帮助',
-            onClick=self.showMessageBox,
-            selectable=False,
-            position=NavigationItemPosition.BOTTOM,
-        )
+        self.addSubInterface(self.libraryInterface, FIF.SETTING, '设置', FIF.SETTING, NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.aboutInterface,FIF.INFO,"关于",FIF.INFO,NavigationItemPosition.BOTTOM)
 
         self.navigationInterface.setCurrentItem(self.homeInterface.objectName())
 
@@ -251,28 +342,20 @@ class Window(MSFluentWindow):
         w, h = desktop.width(), desktop.height()
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)
 
-    def showMessageBox(self):
-        w = MessageBox(
-            '支持作者🥰',
-            '个人开发不易，如果这个项目帮助到了您，可以考虑请作者喝一瓶快乐水🥤。您的支持就是作者开发和维护项目的动力🚀',
-            self
-        )
-        w.yesButton.setText('来啦老弟')
-        w.cancelButton.setText('下次一定')
-
-        if w.exec():
-            self.close()
             
     def waiterProcessor(self,data: dict):
         if not isinstance(data,str):
             if(data['app'] != "crash"):
-                if(data['present'] == True):
+                if(data['present'] == True and data['status'] != "offline"):
                     device_name_list.append(data['serial'])
                     self.homeInterface.ui.ComboBox.setDisabled(False)
                     self.homeInterface.ui.ComboBox.items.clear()
                     self.homeInterface.ui.ComboBox.addItems(device_name_list)
                     self.homeInterface.ui.ComboBox.setCurrentIndex(len(device_name_list)-1)
                     self.navigationInterface.buttons()[1].setDisabled(False)
+                elif(data['status'] == "offline"):
+                    w =  MessageBox("提醒","设备已离线，请尝试重新连接设备")
+                    w.exec()
                 elif(data['present'] != True):
                     device_name_list.remove(data['serial'])
                     self.homeInterface.ui.ComboBox.items.clear()
@@ -286,6 +369,7 @@ class Window(MSFluentWindow):
                         self.homeInterface.ui.StrongBodyLabel_4.setText("(未连接)")
                         self.homeInterface.ui.StrongBodyLabel_6.setText("(未连接)")
                         self.homeInterface.ui.ProgressBar.setValue(0)
+                        self.navigationInterface.setCurrentItem(self.homeInterface.objectName())
                         
                     else:
                         self.homeInterface.ui.ComboBox.setDisabled(False)

@@ -267,9 +267,22 @@ background-color: rgb(223, 232, 245);</string>
     <rect>
      <x>60</x>
      <y>30</y>
-     <width>811</width>
+     <width>511</width>
      <height>4</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="SubtitleLabel" name="SubtitleLabel_8">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>15</y>
+     <width>281</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>正在安装第Null个应用</string>
    </property>
   </widget>
  </widget>
