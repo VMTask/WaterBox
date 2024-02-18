@@ -94,8 +94,11 @@ class Ui_Frame(object):
         self.PrimaryPushButton.setObjectName("PrimaryPushButton")
         self.IndeterminateProgressBar = IndeterminateProgressBar(Frame)
         self.IndeterminateProgressBar.setEnabled(True)
-        self.IndeterminateProgressBar.setGeometry(QtCore.QRect(60, 30, 811, 4))
+        self.IndeterminateProgressBar.setGeometry(QtCore.QRect(60, 30, 511, 4))
         self.IndeterminateProgressBar.setObjectName("IndeterminateProgressBar")
+        self.SubtitleLabel_8 = SubtitleLabel(Frame)
+        self.SubtitleLabel_8.setGeometry(QtCore.QRect(630, 15, 281, 28))
+        self.SubtitleLabel_8.setObjectName("SubtitleLabel_8")
 
         self.retranslateUi(Frame)
         QtCore.QMetaObject.connectSlotsByName(Frame)
@@ -116,6 +119,7 @@ class Ui_Frame(object):
         self.SubtitleLabel_3.setText(_translate("Frame", "APK路径"))
         self.PushButton.setText(_translate("Frame", "选择文件"))
         self.PrimaryPushButton.setText(_translate("Frame", "启动安装"))
+        self.SubtitleLabel_8.setText(_translate("Frame", "正在安装第Null个应用"))
 from qfluentwidgets import ElevatedCardWidget, IconWidget, IndeterminateProgressBar, LineEdit, PlainTextEdit, PrimaryPushButton, PushButton, SimpleCardWidget, SubtitleLabel, TitleLabel
 import os,sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
