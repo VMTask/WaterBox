@@ -1,5 +1,6 @@
-<div align="center">
+<div>
   <img src="https://socialify.git.ci/VMTask/WaterBox/image?description=1&forks=1&language=1&name=1&owner=1&stargazers=1&theme=Light" alt="EdgeGPT" width="640" height="320" />
+<div>
 
 # WaterBox
 A useful ADB ToolBox for your phone or android watch.
