@@ -50,189 +50,7 @@
     </size>
    </property>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>130</y>
-     <width>381</width>
-     <height>241</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">border-radius: 10px;border-style: outset;
-border: 2px rgb(190, 206, 221);
-background-color: rgb(223, 232, 245);</string>
-   </property>
-   <widget class="TitleLabel" name="TitleLabel">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>121</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>HarmonyOS Sans SC</family>
-      <pointsize>17</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>设备状态</string>
-    </property>
-   </widget>
-   <widget class="ComboBox" name="ComboBox">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>70</y>
-      <width>201</width>
-      <height>32</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="StrongBodyLabel" name="StrongBodyLabel">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>75</y>
-      <width>111</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>HarmonyOS Sans SC</family>
-      <pointsize>10</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>选择设备</string>
-    </property>
-   </widget>
-   <widget class="ProgressBar" name="ProgressBar">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>120</y>
-      <width>181</width>
-      <height>4</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="StrongBodyLabel" name="StrongBodyLabel_2">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>110</y>
-      <width>111</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>HarmonyOS Sans SC</family>
-      <pointsize>10</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>电池电量</string>
-    </property>
-   </widget>
-   <widget class="StrongBodyLabel" name="StrongBodyLabel_3">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>140</y>
-      <width>111</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>HarmonyOS Sans SC</family>
-      <pointsize>10</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>设备型号:</string>
-    </property>
-   </widget>
-   <widget class="StrongBodyLabel" name="StrongBodyLabel_4">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>140</y>
-      <width>271</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>HarmonyOS Sans SC</family>
-      <pointsize>10</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>(未连接)</string>
-    </property>
-   </widget>
-   <widget class="StrongBodyLabel" name="StrongBodyLabel_5">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>170</y>
-      <width>111</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>HarmonyOS Sans SC</family>
-      <pointsize>10</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>设备厂商:</string>
-    </property>
-   </widget>
-   <widget class="StrongBodyLabel" name="StrongBodyLabel_6">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>170</y>
-      <width>271</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>HarmonyOS Sans SC</family>
-      <pointsize>10</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>(未连接)</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QWidget" name="widget_2" native="true">
+  <widget class="SimpleCardWidget" name="SimpleCardWidget_2">
    <property name="geometry">
     <rect>
      <x>490</x>
@@ -242,9 +60,14 @@ background-color: rgb(223, 232, 245);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-radius: 10px;border-style: outset;
-border: 2px rgb(190, 206, 221);
-background-color: rgb(223, 232, 245);</string>
+    <string notr="true">FluentLabelBase {
+    color: black;
+	background-color: rgb(244, 247, 252);
+}
+SimpleCardWidget {
+	
+	background-color: rgb(223, 232, 245);
+}</string>
    </property>
    <widget class="TitleLabel" name="TitleLabel_2">
     <property name="geometry">
@@ -356,6 +179,235 @@ background-color: rgb(223, 232, 245);</string>
     </property>
    </widget>
   </widget>
+  <widget class="SimpleCardWidget" name="SimpleCardWidget">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>130</y>
+     <width>381</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">FluentLabelBase {
+    color: black;
+	background-color: rgb(244, 247, 252);
+}
+SimpleCardWidget {
+	background-color: rgb(223, 232, 245);
+}</string>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="borderRadius">
+    <number>10</number>
+   </property>
+   <widget class="ComboBox" name="ComboBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>201</width>
+      <height>32</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="ProgressBar" name="ProgressBar">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>120</y>
+      <width>181</width>
+      <height>4</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="StrongBodyLabel" name="StrongBodyLabel">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>75</y>
+      <width>111</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>HarmonyOS Sans SC</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>选择设备</string>
+    </property>
+   </widget>
+   <widget class="StrongBodyLabel" name="StrongBodyLabel_2">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>110</y>
+      <width>111</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>HarmonyOS Sans SC</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">FluentLabelBase {
+    color: black;
+}
+
+HyperlinkLabel {
+    color: #009faa;
+    border: none;
+    background-color: transparent;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+}
+
+HyperlinkLabel[underline=true] {
+    text-decoration: underline;
+}
+
+HyperlinkLabel[underline=false] {
+    text-decoration: none;
+}
+
+HyperlinkLabel:hover {
+    color: #007780;
+}
+
+HyperlinkLabel:pressed {
+    color: #00a7b3;
+}
+FluentLabelBase{color:#000000}</string>
+    </property>
+    <property name="text">
+     <string>电池电量</string>
+    </property>
+   </widget>
+   <widget class="StrongBodyLabel" name="StrongBodyLabel_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>140</y>
+      <width>111</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>HarmonyOS Sans SC</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>设备型号:</string>
+    </property>
+   </widget>
+   <widget class="StrongBodyLabel" name="StrongBodyLabel_4">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>140</y>
+      <width>271</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>HarmonyOS Sans SC</family>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>(未连接)</string>
+    </property>
+   </widget>
+   <widget class="StrongBodyLabel" name="StrongBodyLabel_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>170</y>
+      <width>111</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>HarmonyOS Sans SC</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>设备厂商:</string>
+    </property>
+   </widget>
+   <widget class="StrongBodyLabel" name="StrongBodyLabel_6">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>170</y>
+      <width>271</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>HarmonyOS Sans SC</family>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>(未连接)</string>
+    </property>
+   </widget>
+   <widget class="TitleLabel" name="TitleLabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>HarmonyOS Sans SC</family>
+      <pointsize>17</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>设备状态</string>
+    </property>
+   </widget>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -377,6 +429,18 @@ background-color: rgb(223, 232, 245);</string>
    <class>IconWidget</class>
    <extends>QWidget</extends>
    <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>CardWidget</class>
+   <extends>QFrame</extends>
+   <header>qfluentwidgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SimpleCardWidget</class>
+   <extends>CardWidget</extends>
+   <header>qfluentwidgets</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>StrongBodyLabel</class>

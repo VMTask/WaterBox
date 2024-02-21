@@ -32,8 +32,8 @@
    </property>
    <property name="styleSheet">
     <string notr="true">PlainTextEdit {
-    color: black;
-    background-color: white;
+    color: green;
+    background-color: black;
     border: 1px solid rgba(0, 0, 0, 13);
     border-bottom: 1px solid rgba(0, 0, 0, 100);
     border-radius: 5px;
@@ -72,9 +72,13 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-radius: 10px;border-style: outset;
-border: 2px rgb(190, 206, 221);
-background-color: rgb(223, 232, 245);</string>
+    <string notr="true">FluentLabelBase {
+    color: black;
+	background-color: rgb(244, 247, 252);
+}
+SimpleCardWidget {
+	background-color: rgb(223, 232, 245);
+}</string>
    </property>
    <widget class="IconWidget" name="IconWidget">
     <property name="geometry">
@@ -205,9 +209,13 @@ background-color: rgb(223, 232, 245);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-radius: 10px;border-style: outset;
-border: 2px rgb(190, 206, 221);
-background-color: rgb(223, 232, 245);</string>
+    <string notr="true">FluentLabelBase {
+    color: black;
+	background-color: rgb(244, 247, 252);
+}
+SimpleCardWidget {
+	background-color: rgb(223, 232, 245);
+}</string>
    </property>
    <widget class="SubtitleLabel" name="SubtitleLabel_3">
     <property name="geometry">

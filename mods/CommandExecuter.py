@@ -24,7 +24,7 @@ class CommandExecuter(QThread):
         self.command = command
     
     def run(self):
-        proc = subprocess.Popen(self.command, stdout=subprocess.PIPE)
+        proc = subprocess.Popen(self.command, stdout=subprocess.PIPE,creationflags=subprocess.CREATE_NO_WINDOW)
         output, _ = proc.communicate()
         decoded_output = output.decode()  # 假设输出为UTF-8编码，根据实际情况选择解码方式
 
@@ -48,7 +48,7 @@ class InstallApp(QThread):
             self.sig.emit("Processing......")
             output=""
             command = f'{os.getcwd()}/adb_executable/adb.exe install -r {url}'
-            p = subprocess.Popen(command, stdout=subprocess.PIPE,encoding="utf-8",stderr=subprocess.STDOUT)
+            p = subprocess.Popen(command, stdout=subprocess.PIPE,encoding="utf-8",stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
             for line in iter(p.stdout.readline, ""):
                 output += line
                 self.sig.emit(output)

@@ -11,13 +11,17 @@ from qfluentwidgets import (NavigationItemPosition, MessageBox, setTheme, Theme,
                             NavigationAvatarWidget, qrouter, SubtitleLabel, setFont, SplashScreen,setThemeColor,SimpleCardWidget)
 from qfluentwidgets import FluentIcon as FIF
 from resources import main_rc
-from interface import HomeActivity, RestartADB
+import subprocess
+from interface import HomeActivity, RestartADB, SettingsActivity
 from datetime import datetime
 import asyncio
 from mods import asyncadb, CommandExecuter, getAPKInfo
 
-
+now_device = ""
 device_name_list = []
+widget_dark_style = ""
+widget_light_style = "FluentLabelBase {\n    color: black;\n	background-color: rgb(244, 247, 252);\n}\nSimpleCardWidget {\n	background-color: rgb(223, 232, 245);\n}"
+terminal_dark_style = 'PlainTextEdit {\n    color: green;\n    background-color: black;\n    border: 1px solid rgba(0, 0, 0, 13);\n    border-bottom: 1px solid rgba(0, 0, 0, 100);\n    border-radius: 5px;\n    /* font: 14px "Segoe UI", "Microsoft YaHei"; */\n    padding: 0px 10px;\n}\n'
 from interface import ApplicationActivity
 
 
@@ -53,7 +57,7 @@ class ADBWaiter(QThread):
     error_sig = pyqtSignal(str)
     
     def __init__(self, parent=None):
-        super(ADBWaiter, self).__init__(parent)
+        super().__init__(parent)
         
     async def wait_track_devices(self):
         waiter = asyncadb.AdbClient()
@@ -149,7 +153,7 @@ class ApplicationWidget(QFrame):
                 w.exec()
     
     def install_application_info_processor(self,data):
-        if("failed" in data):
+        if("failed" in data or "Failure" in data):
             w = MessageBox("错误",f"安装时出现错误,错误如下:\n{data}",self)
             w.exec()
         elif(data == "Installed"):
@@ -216,21 +220,33 @@ class HomeWidget(QFrame):
         number_validator = QRegExpValidator(number_reg_exp,self.ui.LineEdit_2)
         self.ui.LineEdit_2.setValidator(number_validator)
         self.ui.PrimaryPushButton.clicked.connect(self.connectDevices)
+        
     
     def getModelThread_response(self,data:str):
-        lines = data.split('\n')  # 将字符串按换行符分割成列表
-        non_empty_lines = [line for line in lines if line.strip()]  # 使用列表推导式仅保留非空行
-        result = '\n'.join(non_empty_lines)  # 用换行符重新连接非空行
-        self.ui.StrongBodyLabel_4.setText(result)
+        try:
+            lines = data.split('\n')  # 将字符串按换行符分割成列表
+            non_empty_lines = [line for line in lines if line.strip()]  # 使用列表推导式仅保留非空行
+            result = '\n'.join(non_empty_lines)  # 用换行符重新连接非空行
+            self.ui.StrongBodyLabel_4.setText(result)
+        except:
+            pass
             
     def getBatteryThread_response(self,data:str):
-        self.ui.ProgressBar.setValue(int(data.replace("level:","")))
+        try:
+            self.ui.ProgressBar.setValue(int(data.replace("level:","")))
+        except:
+            self.getBatteryThread.start()
     def getManufacturerThread_response(self,data:str):
-        lines = data.split('\n')  # 将字符串按换行符分割成列表
-        non_empty_lines = [line for line in lines if line.strip()]  # 使用列表推导式仅保留非空行
-        result = '\n'.join(non_empty_lines)  # 用换行符重新连接非空行
-        self.ui.StrongBodyLabel_6.setText(result)
+        try:
+            lines = data.split('\n')  # 将字符串按换行符分割成列表
+            non_empty_lines = [line for line in lines if line.strip()]  # 使用列表推导式仅保留非空行
+            result = '\n'.join(non_empty_lines)  # 用换行符重新连接非空行
+            self.ui.StrongBodyLabel_6.setText(result)
+        except:
+            pass
     def onComboBoxTextChanged(self):
+        global now_device
+        now_device = self.ui.ComboBox.currentText()
         self.getModelThread = CommandExecuter.CommandExecuter(f".\\adb_executable\\adb -s {self.ui.ComboBox.currentText()} shell getprop ro.product.model")
         self.getModelThread.sig.connect(self.getModelThread_response)
         self.getModelThread.wait()
@@ -313,12 +329,29 @@ class Window(MSFluentWindow):
         setThemeColor('#28afe9')
         self.appInterface = ApplicationWidget(self)
         self.videoInterface = Widget('Video Interface', self)
-        self.libraryInterface = Widget('library Interface', self)
+        self.settingsInterface = SettingsActivity.SettingInterface(self)
         self.aboutInterface = Widget("关于界面",self)
         self.waiterThread = ADBWaiter()
         self.waiterThread.sig.connect(self.waiterProcessor)
         self.waiterThread.error_sig.connect(self.waiterProcessor)
         self.waiterThread.start()
+        if(os.path.exists(f"{os.getcwd()}/config.json")):
+            with open(f"{os.getcwd()}/config.json", 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            if(config["isDarkMode"]):
+                if(config["isMica"]):
+                    setTheme(Theme.DARK)
+                    self.homeInterface.ui.SimpleCardWidget.setStyleSheet(widget_dark_style)
+                    self.homeInterface.ui.SimpleCardWidget_2.setStyleSheet(widget_dark_style)
+                    self.appInterface.ui.ElevatedCardWidget.setStyleSheet(widget_dark_style)
+                    self.appInterface.ui.SimpleCardWidget.setStyleSheet(widget_dark_style)
+                    self.settingsInterface.settingLabel.setStyleSheet("font: 33px 'Microsoft YaHei Light';background-color: transparent;color: white;")
+            else:
+                setTheme(Theme.LIGHT)
+            if(config["isMica"]):
+                self.windowEffect.setMicaEffect(self.winId(),isDarkMode=config["isDarkMode"])
+            if(config["isAcrylic"]):
+                self.windowEffect.setAcrylicEffect(self.winId())
         self.initNavigation()
         self.initWindow()
 
@@ -326,13 +359,21 @@ class Window(MSFluentWindow):
         self.addSubInterface(self.homeInterface, FIF.HOME, '主页', FIF.HOME_FILL)
         self.addSubInterface(self.appInterface, FIF.APPLICATION, '应用安装')
         self.addSubInterface(self.videoInterface, FIF.VIDEO, '屏幕工具箱')
-        self.navigationInterface.buttons()[1].setDisabled(True)
+        self.appInterface.ui.PrimaryPushButton.setDisabled(True)
 
-        self.addSubInterface(self.libraryInterface, FIF.SETTING, '设置', FIF.SETTING, NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.settingsInterface, FIF.SETTING, '设置', FIF.SETTING, NavigationItemPosition.BOTTOM)
         self.addSubInterface(self.aboutInterface,FIF.INFO,"关于",FIF.INFO,NavigationItemPosition.BOTTOM)
-
+        self.navigationInterface.addItem(
+            routeKey='ADB_Terminal',
+            icon=FIF.COMMAND_PROMPT,
+            text='ADB终端',
+            onClick=self.adb_terminal,
+            selectable=False,
+            position=NavigationItemPosition.BOTTOM,
+        )
         self.navigationInterface.setCurrentItem(self.homeInterface.objectName())
-
+    def adb_terminal(self):
+        os.system(f'start cmd /k cd {os.getcwd()}/adb_executable/')
     def initWindow(self):
         self.resize(1000, 700)
         self.setFixedSize(1000,700)
@@ -352,7 +393,7 @@ class Window(MSFluentWindow):
                     self.homeInterface.ui.ComboBox.items.clear()
                     self.homeInterface.ui.ComboBox.addItems(device_name_list)
                     self.homeInterface.ui.ComboBox.setCurrentIndex(len(device_name_list)-1)
-                    self.navigationInterface.buttons()[1].setDisabled(False)
+                    self.appInterface.ui.PrimaryPushButton.setDisabled(False)
                 elif(data['status'] == "offline"):
                     w =  MessageBox("提醒","设备已离线，请尝试重新连接设备")
                     w.exec()
@@ -365,7 +406,7 @@ class Window(MSFluentWindow):
                     if(len(device_name_list) == 0):
                         self.homeInterface.ui.ComboBox.setDisabled(True)
                         self.homeInterface.ui.ComboBox.setText("(未连接)")
-                        self.navigationInterface.buttons()[1].setDisabled(True)
+                        self.appInterface.ui.PrimaryPushButton.setDisabled(True)
                         self.homeInterface.ui.StrongBodyLabel_4.setText("(未连接)")
                         self.homeInterface.ui.StrongBodyLabel_6.setText("(未连接)")
                         self.homeInterface.ui.ProgressBar.setValue(0)
@@ -373,7 +414,7 @@ class Window(MSFluentWindow):
                         
                     else:
                         self.homeInterface.ui.ComboBox.setDisabled(False)
-                        self.navigationInterface.buttons()[1].setDisabled(False)
+                        self.appInterface.ui.PrimaryPushButton.setDisabled(False)
                         self.homeInterface.ui.ComboBox.setCurrentIndex(len(device_name_list))
             else:
                 w = MessageBox("ERROR", f"程序已崩溃,崩溃原因如下:{data['error']}", self)
