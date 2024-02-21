@@ -19,6 +19,7 @@ A useful ADB ToolBox for your phone or android watch.
 ## Libraries
 [PyQt-Fluent-Widgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets)
 [atxserver2-android-provider](https://github.com/openatx/atxserver2-android-provider/)
+
 Icons by [icons8](icons8.com)
 
 ## Install

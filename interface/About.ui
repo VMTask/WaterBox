@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Frame</class>
+ <widget class="QFrame" name="Frame">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>925</width>
+    <height>641</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Frame</string>
+  </property>
+  <widget class="DisplayLabel" name="DisplayLabel">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>280</y>
+     <width>301</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>WaterBox</string>
+   </property>
+  </widget>
+  <widget class="HyperlinkButton" name="HyperlinkButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>590</y>
+     <width>128</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Github</string>
+   </property>
+   <property name="url">
+    <url>
+     <string>https://github.com/VMTask/WaterBox</string>
+    </url>
+   </property>
+  </widget>
+  <widget class="SubtitleLabel" name="SubtitleLabel">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>360</y>
+     <width>211</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>一个好用的ADB工具箱</string>
+   </property>
+  </widget>
+  <widget class="StrongBodyLabel" name="StrongBodyLabel">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>390</y>
+     <width>181</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Alpha Build Version</string>
+   </property>
+  </widget>
+  <widget class="HyperlinkButton" name="HyperlinkButton_2">
+   <property name="geometry">
+    <rect>
+     <x>747</x>
+     <y>590</y>
+     <width>161</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>图标来自icon8.com</string>
+   </property>
+   <property name="url">
+    <url>
+     <string>https://icons8.com</string>
+    </url>
+   </property>
+  </widget>
+  <widget class="ElevatedCardWidget" name="ElevatedCardWidget">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>120</y>
+     <width>341</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>30</y>
+      <width>111</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+        background-color: rgba(0, 0, 0, 5%); /* 这里是半透明黑色背景，最后一个值是 alpha 通道，控制透明度 */
+        border: 2px solid rgba(255, 255, 255, 50%); /* 这里是半透明白色边框，同样调整 alpha 通道以控制透明度 */
+        border-radius: 10px; /* 设置边框的圆角大小 */
+        padding: 4px; /* 如果需要内部内容与边框保持一定距离可设置内边距 */
+    }</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="IconWidget" name="IconWidget">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>40</y>
+      <width>91</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(0, 0, 0, 10%);
+border: 2px solid rgba(255, 255, 255, 50%);
+border-radius: 10px;
+padding: 4px;</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../resources/icon.png</normaloff>../resources/icon.png</iconset>
+    </property>
+   </widget>
+  </widget>
+  <widget class="ToolButton" name="ToolButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>38</width>
+     <height>32</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HyperlinkButton</class>
+   <extends>PushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>PushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>ToolButton</class>
+   <extends>QToolButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>IconWidget</class>
+   <extends>QWidget</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>CardWidget</class>
+   <extends>QFrame</extends>
+   <header>qfluentwidgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ElevatedCardWidget</class>
+   <extends>SimpleCardWidget</extends>
+   <header>qfluentwidgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SimpleCardWidget</class>
+   <extends>CardWidget</extends>
+   <header>qfluentwidgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>StrongBodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SubtitleLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>DisplayLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

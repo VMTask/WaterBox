@@ -12,7 +12,7 @@ from qfluentwidgets import (NavigationItemPosition, MessageBox, setTheme, Theme,
 from qfluentwidgets import FluentIcon as FIF
 from resources import main_rc
 import subprocess
-from interface import HomeActivity, RestartADB, SettingsActivity
+from interface import HomeActivity, RestartADB, SettingsActivity, About
 from datetime import datetime
 import asyncio
 from mods import asyncadb, CommandExecuter, getAPKInfo
@@ -81,8 +81,18 @@ class ADBWaiter(QThread):
     def run(self):
         asyncio.run(self.wait_track_devices())
 
+class AboutWidget(QFrame):
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        
+        self.ui = About.Ui_Frame()
+        self.ui.setupUi(self)
+        self.setObjectName("About")
+        self.ui.IconWidget.setIcon(QIcon(":/images/icon.png"))
+        self.ui.ToolButton.setIcon(FIF.RETURN)
+
 class ApplicationWidget(QFrame):
-    def __init__(self, parent: None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         
         self.ui = ApplicationActivity.Ui_Frame()
@@ -330,15 +340,16 @@ class Window(MSFluentWindow):
         self.appInterface = ApplicationWidget(self)
         self.videoInterface = Widget('Video Interface', self)
         self.settingsInterface = SettingsActivity.SettingInterface(self)
-        self.aboutInterface = Widget("关于界面",self)
+        self.aboutInterface = AboutWidget(self)
         self.waiterThread = ADBWaiter()
         self.waiterThread.sig.connect(self.waiterProcessor)
         self.waiterThread.error_sig.connect(self.waiterProcessor)
         self.waiterThread.start()
-        if(os.path.exists(f"{os.getcwd()}/config.json")):
-            with open(f"{os.getcwd()}/config.json", 'r', encoding='utf-8') as f:
+        self.aboutInterface.ui.ToolButton.clicked.connect(self.return_home)
+        if(os.path.exists(f"{os.getcwd()}/config/config.json")):
+            with open(f"{os.getcwd()}/config/config.json", 'r', encoding='utf-8') as f:
                 config = json.load(f)
-            if(config["isDarkMode"]):
+            if(config["QFluentWidgets"]["ThemeMode"] == "Dark"):
                 if(config["isMica"]):
                     setTheme(Theme.DARK)
                     self.homeInterface.ui.SimpleCardWidget.setStyleSheet(widget_dark_style)
@@ -348,13 +359,19 @@ class Window(MSFluentWindow):
                     self.settingsInterface.settingLabel.setStyleSheet("font: 33px 'Microsoft YaHei Light';background-color: transparent;color: white;")
             else:
                 setTheme(Theme.LIGHT)
-            if(config["isMica"]):
-                self.windowEffect.setMicaEffect(self.winId(),isDarkMode=config["isDarkMode"])
-            if(config["isAcrylic"]):
+            if(config["QFluentWidgets"]["isMica"]):
+                if(config["QFluentWidgets"]["ThemeMode"] == "Dark"):
+                    self.windowEffect.setMicaEffect(self.winId(),isDarkMode=True)
+                else:
+                    self.windowEffect.setMicaEffect(self.winId(),isDarkMode=False)
+            if(config["QFluentWidgets"]["isAcrylic"]):
                 self.windowEffect.setAcrylicEffect(self.winId())
+            if(config["QFluentWidgets"]["isAero"]):
+                self.windowEffect.setAeroEffect(self.winId())
         self.initNavigation()
         self.initWindow()
-
+    def return_home(self):
+        self.switchTo(self.homeInterface)
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, FIF.HOME, '主页', FIF.HOME_FILL)
         self.addSubInterface(self.appInterface, FIF.APPLICATION, '应用安装')
@@ -373,7 +390,7 @@ class Window(MSFluentWindow):
         )
         self.navigationInterface.setCurrentItem(self.homeInterface.objectName())
     def adb_terminal(self):
-        os.system(f'start cmd /k cd {os.getcwd()}/adb_executable/')
+        subprocess.Popen(['cmd', '/k', f'cd {os.getcwd()}/adb_executable'], creationflags=subprocess.CREATE_NEW_CONSOLE)
     def initWindow(self):
         self.resize(1000, 700)
         self.setFixedSize(1000,700)
@@ -410,8 +427,6 @@ class Window(MSFluentWindow):
                         self.homeInterface.ui.StrongBodyLabel_4.setText("(未连接)")
                         self.homeInterface.ui.StrongBodyLabel_6.setText("(未连接)")
                         self.homeInterface.ui.ProgressBar.setValue(0)
-                        self.navigationInterface.setCurrentItem(self.homeInterface.objectName())
-                        
                     else:
                         self.homeInterface.ui.ComboBox.setDisabled(False)
                         self.appInterface.ui.PrimaryPushButton.setDisabled(False)
