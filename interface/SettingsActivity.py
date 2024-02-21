@@ -40,7 +40,7 @@ class SettingInterface(ScrollArea):
 
 
         # personalization
-        self.personalGroup = SettingCardGroup(self.tr('Personalization'), self.scrollWidget)
+        self.personalGroup = SettingCardGroup(self.tr('个性化'), self.scrollWidget)
         """self.enableAcrylicCard = SwitchSettingCard(
             FIF.TRANSPARENT,
             self.tr("Use Acrylic effect"),
@@ -51,41 +51,30 @@ class SettingInterface(ScrollArea):
         self.themeCard = OptionsSettingCard(
             QConfig.themeMode,
             FIF.BRUSH,
-            self.tr('Application theme'),
-            self.tr("Change the appearance of your application"),
+            self.tr('应用主题'),
+            self.tr("修改应用外观"),
             texts=[
-                self.tr('Light'), self.tr('Dark'),
-                self.tr('Use system setting')
+                self.tr('亮色'), self.tr('深色'),
+                self.tr('跟随系统')
             ],
             parent=self.personalGroup
         )
         self.themeColorCard=CustomColorSettingCard(
             QConfig.themeColor,
             FIF.PALETTE,
-            self.tr('Theme color'),
-            self.tr('Change the theme color of you application'),
+            self.tr('主题颜色'),
+            self.tr('修改应用主题颜色'),
             self.personalGroup
         )
 
 
         
-        # main panel
-        self.mainPanelGroup = SettingCardGroup(self.tr('Main Panel'), self.scrollWidget)
-        self.minimizeToTrayCard = SwitchSettingCard(
-            FIF.MINIMIZE,
-            self.tr('Minimize to tray after closing'),
-            self.tr('PyQt-Fluent-Widgets will continue to run in the background'),
-            configItem=ConfigItem(
-        "MainWindow", "MinimizeToTray", True, BoolValidator()),
-            parent=self.mainPanelGroup
-        )
-
         # update software
         self.updateSoftwareGroup = SettingCardGroup(self.tr("Software update"), self.scrollWidget)
         self.updateOnStartUpCard = SwitchSettingCard(
             FIF.UPDATE,
-            self.tr('Check for updates when the application starts'),
-            self.tr('The new version will be more stable and have more features'),
+            self.tr('检查软件更新'),
+            self.tr('更新最新的软件版本'),
             configItem=ConfigItem(
         "Update", "CheckUpdateAtStartUp", True, BoolValidator()),
             parent=self.updateSoftwareGroup
@@ -143,7 +132,6 @@ class SettingInterface(ScrollArea):
 
         self.updateSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
 
-        self.mainPanelGroup.addSettingCard(self.minimizeToTrayCard)
 
         self.aboutGroup.addSettingCard(self.helpCard)
         self.aboutGroup.addSettingCard(self.feedbackCard)
@@ -153,7 +141,6 @@ class SettingInterface(ScrollArea):
         self.expandLayout.setSpacing(28)
         self.expandLayout.setContentsMargins(60, 10, 60, 0)
         self.expandLayout.addWidget(self.personalGroup)
-        self.expandLayout.addWidget(self.mainPanelGroup)
         self.expandLayout.addWidget(self.updateSoftwareGroup)
         self.expandLayout.addWidget(self.aboutGroup)
 
@@ -203,9 +190,6 @@ class SettingInterface(ScrollArea):
 
         self.themeColorCard.colorChanged.connect(setThemeColor)
 
-        # main panel
-        self.minimizeToTrayCard.checkedChanged.connect(
-            self.minimizeToTrayChanged)
 
         # about
         self.aboutCard.clicked.connect(self.checkUpdateSig)
