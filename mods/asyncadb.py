@@ -122,7 +122,7 @@ class AdbClient(object):
                 yield (
                     "adb connection is down")
                 await gen.sleep(sleep)
-                subprocess.run(['adb_executable\\adb', 'start-server'])
+                subprocess.run(['adb_executable\\adb', 'start-server'],creationflags=subprocess.CREATE_NO_WINDOW)
                 version = await self.server_version()
                 yield "started"
 

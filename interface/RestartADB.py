@@ -56,6 +56,7 @@ class RestartADBWindow(AcrylicWindow, Ui_Form):
         desktop = QApplication.desktop().availableGeometry()
         w, h = desktop.width(), desktop.height()
         self.move(w//2 - self.width()//2, h//2 - self.height()//2)
+        self.setFixedSize(400, 113)
 
 
 

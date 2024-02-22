@@ -43,8 +43,6 @@ class InstallApp(QThread):
         for url in self.urls:
             count += 1
             self.int_sig.emit(count)
-            with open("test.log","w") as f:
-                f.write(url)
             self.sig.emit("Processing......")
             output=""
             command = f'{os.getcwd()}/adb_executable/adb.exe install -r {url}'

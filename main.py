@@ -4,11 +4,11 @@ import shutil
 import sys
 import os
 import time
-from PyQt5.QtCore import Qt, QUrl, QThread, pyqtSignal, pyqtSlot, QSize, QEventLoop, QTimer, QRegExp
-from PyQt5.QtGui import QIcon, QDesktopServices, QDragEnterEvent, QDropEvent, QRegExpValidator
-from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QWidget, QFileDialog
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QRegExp
+from PyQt5.QtGui import QIcon, QDragEnterEvent, QDropEvent, QRegExpValidator
+from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout,  QFileDialog
 from qfluentwidgets import (NavigationItemPosition, MessageBox, setTheme, Theme, MSFluentWindow,
-                            NavigationAvatarWidget, qrouter, SubtitleLabel, setFont, SplashScreen,setThemeColor,SimpleCardWidget)
+                            SubtitleLabel, setFont,setThemeColor)
 from qfluentwidgets import FluentIcon as FIF
 from resources import main_rc
 import subprocess
